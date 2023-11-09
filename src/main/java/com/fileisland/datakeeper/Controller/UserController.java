@@ -6,8 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller("/user")
+@RestController("/user")
 public class UserController {
 
     @Autowired
@@ -19,7 +20,7 @@ public class UserController {
         return ResponseEntity.ok(userService.findById(id));
     }
 
-    @GetMapping("/all")
+    @GetMapping("all")
     public ResponseEntity getAllUsers(){
         return ResponseEntity.ok(userService.getAllUsers());
     }
