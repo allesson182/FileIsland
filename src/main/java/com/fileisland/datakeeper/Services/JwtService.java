@@ -1,0 +1,59 @@
+package com.fileisland.datakeeper.Services;
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.fileisland.datakeeper.Dao.Entity.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
+
+@Service
+public class JwtService {
+
+    @Value("${jwt.secret}")
+    private String SECRET;
+
+    @Autowired
+    private UserService userService;
+    public String generateToken(User user){
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(SECRET);
+            String token = JWT.create()
+                    .withIssuer("API FileIsland")
+                    .withSubject(user.getUsername())
+                    .withClaim("id", user.getId())
+                    .withClaim("email", user.getEmail())
+                    //now plus 2 hours
+                    .withExpiresAt(new Date(System.currentTimeMillis() + 7200000))
+                    .sign(algorithm);
+            return token;
+        } catch (JWTCreationException exception){
+            throw new RuntimeException("Error creating token", exception);
+        }
+
+    }
+
+    public String getUsernameFromToken(String token){
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(SECRET);
+            String username = JWT.require(algorithm)
+                    // specify an specific claim validations
+                    .withIssuer("API FileIsland")
+                    // reusable verifier instance
+                    .build()
+                    .verify(token)
+                    .getSubject();
+            return username;
+        } catch (JWTVerificationException exception){
+            throw new RuntimeException("Error verifying token", exception);
+        }
+    }
+
+    public User GetUserFromToken(String token){
+       return userService.findByUsername(getUsernameFromToken(token));
+    }
+}
