@@ -5,9 +5,11 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.fileisland.datakeeper.Dao.Entity.User;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
 
 import java.util.Date;
 
@@ -19,6 +21,8 @@ public class JwtService {
 
     @Autowired
     private UserService userService;
+
+    private static Logger LOGGER = LoggerFactory.getLogger(JwtService.class);
     public String generateToken(User user){
         try {
             Algorithm algorithm = Algorithm.HMAC256(SECRET);
@@ -47,11 +51,12 @@ public class JwtService {
                     .verify(token)
                     .getSubject();
         } catch (JWTVerificationException exception){
+            LOGGER.error("Error verifying token");
             throw new RuntimeException("Error verifying token", exception);
         }
     }
 
     public User GetUserFromToken(String token){
-       return userService.findByUsername(getUsernameFromToken(token));
+       return userService.findByUsername(this.getUsernameFromToken(token));
     }
 }
