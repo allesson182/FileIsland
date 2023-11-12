@@ -26,7 +26,7 @@ public class SecurityConfig{
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         return http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(req -> req.requestMatchers(HttpMethod.POST,"/login")
+                .authorizeHttpRequests(req -> req.requestMatchers("/login","/user/create")
                         .permitAll()
                         .anyRequest().authenticated()) //v 13
                 .addFilterBefore(httpFilter, UsernamePasswordAuthenticationFilter.class)
