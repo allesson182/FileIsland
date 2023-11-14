@@ -96,7 +96,7 @@ public class S3Service {
 
 
     @PostConstruct
-    private void testConection(){
+    private void testConnection(){
         try {
             s3Client.listBuckets();
             LOGGER.info(" ------------------------------ Connected to S3 ---------------------------------");
