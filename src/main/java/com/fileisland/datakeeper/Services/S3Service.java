@@ -14,7 +14,6 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
 
 @Service
@@ -27,7 +26,7 @@ public class S3Service {
     @Value("${s3.bucketName}")
     private String bucketName;
 
-    public List<S3Object> listObjects(Long userId) {
+    public List listObjects(Long userId) {
         ListObjectsRequest listObjectsRequest = ListObjectsRequest.builder()
                 .bucket(bucketName)
                 .prefix(userId.toString())

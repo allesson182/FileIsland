@@ -21,7 +21,7 @@ public class FileController {
     @Autowired
     private S3Service s3Service;
 
-    @GetMapping("/list/")
+    @GetMapping("/list")
     public ResponseEntity listObjects(@RequestBody ListObjectsDTO listObjectsDTO) {
         return ResponseEntity.ok(s3Service.listObjects(listObjectsDTO.userId()));
     }
