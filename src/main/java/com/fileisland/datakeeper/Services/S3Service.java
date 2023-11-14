@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class S3Service {
     @Autowired
     private S3Client s3Client;
-    private static Logger LOGGER = LoggerFactory.getLogger(S3Service.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(S3Service.class);
 
 
     @Value("${s3.bucketName}")
@@ -69,7 +69,7 @@ public class S3Service {
             System.out.println("Object uploaded successfully");
         } catch (IOException e) {
             // Handle exception
-            e.printStackTrace();
+            LOGGER.error("Error uploading object to S3", e);
         }
 }
 
@@ -106,7 +106,6 @@ public class S3Service {
         }
 
     }
-
 
     public List<S3Object> listObjectsSearch(Long userId, String search, int page, int pageSize) {
        return listObjects(userId, page, pageSize).stream()
