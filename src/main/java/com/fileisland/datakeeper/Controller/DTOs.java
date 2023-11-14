@@ -9,3 +9,4 @@ record ListObjectsDTO(Long userId, String searchWord, int page, int pageSize){}
 record DownloadObjectDTO(Long userId, String objectKey){};
 record UploadObjectDTO(Long userId, String objectKey, MultipartFile file){}
 record DeleteObjectDTO(Long userId, String objectKey){};
+record RenameObjectDTO(Long userId, String objectKey, String newObjectKey){};

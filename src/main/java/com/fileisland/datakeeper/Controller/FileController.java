@@ -56,5 +56,11 @@ public class FileController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/rename")
+    public ResponseEntity renameObject(@RequestBody RenameObjectDTO objectDTO){
+        s3Service.renameObject(objectDTO.userId(), objectDTO.objectKey(), objectDTO.newObjectKey());
+        return ResponseEntity.ok().build();
+    }
+
 
 }

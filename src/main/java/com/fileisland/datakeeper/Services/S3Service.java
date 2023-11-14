@@ -82,6 +82,18 @@ public class S3Service {
         this.LOGGER.info("Object {} deleted successfully", key);
     }
 
+    public void renameObject(Long userId, String key, String newKey) {
+        CopyObjectRequest copyObjectRequest = CopyObjectRequest.builder()
+                .sourceBucket(this.bucketName)
+                .sourceKey(userId + "/" + key)
+                .destinationBucket(this.bucketName)
+                .destinationKey(userId + "/" + newKey)
+                .build();
+        s3Client.copyObject(copyObjectRequest);
+        this.deleteObject(userId, key);
+        this.LOGGER.info("Object {} renamed successfully", key);
+    }
+
 
     @PostConstruct
     private void testConection(){
