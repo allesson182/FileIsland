@@ -15,6 +15,7 @@ import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class S3Service {
@@ -26,13 +27,22 @@ public class S3Service {
     @Value("${s3.bucketName}")
     private String bucketName;
 
-    public List listObjects(Long userId) {
-        ListObjectsRequest listObjectsRequest = ListObjectsRequest.builder()
+    public List<S3Object> listObjects(Long userId, int page, int pageSize) {
+        ListObjectsV2Request listObjectsRequest = ListObjectsV2Request.builder()
                 .bucket(bucketName)
                 .prefix(userId.toString())
+                .maxKeys(page * pageSize)
                 .build();
 
-        ListObjectsResponse listObjectsResponse = s3Client.listObjects(listObjectsRequest);
+        ListObjectsV2Response listObjectsResponse = s3Client.listObjectsV2(listObjectsRequest);
+        //pagination
+        if (listObjectsResponse.isTruncated() && page > 1)
+            listObjectsResponse = s3Client.listObjectsV2(ListObjectsV2Request.builder()
+                    .bucket(bucketName)
+                    .prefix(userId.toString())
+                    .maxKeys(page * pageSize)
+                    .continuationToken(listObjectsResponse.nextContinuationToken())
+                    .build());
 
         return listObjectsResponse.contents();
     }
@@ -69,16 +79,26 @@ public class S3Service {
                         .key(userId + "/" + key)
                         .build();
         s3Client.deleteObject(deleteObjectRequest);
-        this.LOGGER.info("");
+        this.LOGGER.info("Object {} deleted successfully", key);
     }
+
 
     @PostConstruct
     private void testConection(){
-        String ss = s3Client.listBuckets().owner().displayName();
-        if (ss != null)
-            LOGGER.info(" --- S3 connection OK");
-        else
-            LOGGER.error(" --- S3 connection failed");
+        try {
+            s3Client.listBuckets();
+            LOGGER.info(" ------------------------------ Connected to S3 ---------------------------------");
+        } catch (Exception e) {
+            LOGGER.error(" ------------------------------ Error connecting to S3 ---------------------------------");
+            throw e;
+        }
 
+    }
+
+
+    public List<S3Object> listObjectsSearch(Long userId, String search, int page, int pageSize) {
+       return listObjects(userId, page, pageSize).stream()
+                .filter(s3Object -> s3Object.key().toLowerCase().contains(search.toLowerCase()))
+                .collect(Collectors.toList());
     }
 }

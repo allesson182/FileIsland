@@ -13,6 +13,7 @@ import software.amazon.awssdk.services.s3.model.S3Object;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/s3")
@@ -23,7 +24,14 @@ public class FileController {
 
     @GetMapping("/list")
     public ResponseEntity listObjects(@RequestBody ListObjectsDTO listObjectsDTO) {
-        return ResponseEntity.ok(s3Service.listObjects(listObjectsDTO.userId()));
+        int page = Optional.of(listObjectsDTO.page()).orElse(1);
+        int pageSize = Optional.of(listObjectsDTO.pageSize()).orElse(10);
+        if (page < 1 || pageSize < 1)
+            return ResponseEntity.badRequest().build();
+        if (listObjectsDTO.searchWord() == null || listObjectsDTO.searchWord().isEmpty())
+            return ResponseEntity.ok(s3Service.listObjects(listObjectsDTO.userId(), page, pageSize));
+
+        return ResponseEntity.ok(s3Service.listObjectsSearch(listObjectsDTO.userId(), listObjectsDTO.searchWord(), page, pageSize));
     }
 
     @GetMapping("/download")
@@ -47,4 +55,6 @@ public class FileController {
         s3Service.deleteObject(objectDTO.userId(), objectDTO.objectKey());
         return ResponseEntity.ok().build();
     }
+
+
 }
