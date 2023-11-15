@@ -24,7 +24,7 @@ public class JwtService {
 
     private static Logger LOGGER = LoggerFactory.getLogger(JwtService.class);
     public String generateToken(User user){
-        try {
+
             Algorithm algorithm = Algorithm.HMAC256(SECRET);
             return JWT.create()
                     .withIssuer("API FileIsland")
@@ -34,9 +34,6 @@ public class JwtService {
                     //now plus 2 hours
                     .withExpiresAt(new Date(System.currentTimeMillis() + 7200000))
                     .sign(algorithm);
-        } catch (JWTCreationException exception){
-            throw new RuntimeException("Error creating token", exception);
-        }
 
     }
 
@@ -52,11 +49,11 @@ public class JwtService {
                     .getSubject();
         } catch (JWTVerificationException exception){
             LOGGER.error("Error verifying token");
-            throw new RuntimeException("Error verifying token", exception);
+            throw exception;
         }
     }
 
-    public User GetUserFromToken(String token){
+    public User GetUserFromToken(String token)  {
        return userService.findByUsername(this.getUsernameFromToken(token));
     }
 }

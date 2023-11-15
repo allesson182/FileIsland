@@ -1,7 +1,9 @@
 package com.fileisland.datakeeper.Controller;
 
+import com.fileisland.datakeeper.Dao.Entity.User;
 import com.fileisland.datakeeper.Services.JwtService;
 import com.fileisland.datakeeper.Services.S3Service;
+import com.fileisland.datakeeper.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
@@ -21,13 +23,17 @@ public class FileController {
 
     @Autowired
     private S3Service s3Service;
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/list")
     public ResponseEntity listObjects(@RequestBody ListObjectsDTO listObjectsDTO) {
-        int page = Optional.of(listObjectsDTO.page()).orElse(1);
-        int pageSize = Optional.of(listObjectsDTO.pageSize()).orElse(10);
-        if (page < 1 || pageSize < 1)
-            return ResponseEntity.badRequest().build();
+        //if page and pageSize are not present or is less than 1, set default values to 1 and 10
+        int page = Optional.of(listObjectsDTO.page()).orElse(1) < 1 ? 1 : listObjectsDTO.page();
+        int pageSize = Optional.of(listObjectsDTO.pageSize()).orElse(10) < 1 ? 10 : listObjectsDTO.pageSize();
+
+        User user = userService.findById(listObjectsDTO.userId());
+
         if (listObjectsDTO.searchWord() == null || listObjectsDTO.searchWord().isEmpty())
             return ResponseEntity.ok(s3Service.listObjects(listObjectsDTO.userId(), page, pageSize));
 

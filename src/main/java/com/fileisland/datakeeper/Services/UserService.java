@@ -24,7 +24,7 @@ public class UserService {
         return userDao.findAll();
     }
     public User findById(Long id){
-        return userDao.findById(id).orElse(null);
+        return userDao.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
     public User save(User user){
         return userDao.save(user);
