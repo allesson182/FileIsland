@@ -30,7 +30,9 @@ public class SecutiryHttpFilter extends OncePerRequestFilter {
            SecurityContextHolder.getContext().setAuthentication(authentication);
            }
 
-        response.addHeader("Access-Control-Allow-Origin", "*");
+       response.addHeader("Access-Control-Allow-Origin", "*");
+       response.addHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, PATCH, HEAD");
+       response.addHeader("Access-Control-Allow-Headers", "*");
 
         filterChain.doFilter(request, response);
     }

@@ -6,14 +6,21 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.ResponseBytes;
+import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
+import javax.crypto.Cipher;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,15 +54,22 @@ public class S3Service {
         return listObjectsResponse.contents();
     }
 
-    public ByteArrayResource downloadObject(String userId, String objectKey) throws IOException {
+    public Resource downloadObject(String userId, String objectKey) throws IOException {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)
                 .key(userId + "/" + objectKey)
                 .build();
+        ResponseInputStream<GetObjectResponse> responseInputStream = s3Client.getObject(getObjectRequest);
+        return new InputStreamResource(responseInputStream);
+//        return ResponseEntity.ok()
+//                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + objectKey)
+//                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+//                .contentLength(responseInputStream.response().contentLength())
+//                .body(resource);
 
-        ResponseBytes<GetObjectResponse> responseBytes = s3Client.getObjectAsBytes(getObjectRequest);
-        byte[] content = responseBytes.asByteArray();
-        return new ByteArrayResource(content);
+//        ResponseBytes<GetObjectResponse> responseBytes = s3Client.getObjectAsBytes(getObjectRequest);
+//        byte[] content = responseBytes.asByteArray();
+//        return new ByteArrayResource(content);
 
     }
 
@@ -66,7 +80,7 @@ public class S3Service {
                     .key(userId + "/" + objectKey)
                     .build();
             s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(file.getInputStream(),file.getSize()));
-            System.out.println("Object uploaded successfully");
+            LOGGER.info("Object {} uploaded successfully", objectKey);
         } catch (IOException e) {
             // Handle exception
             LOGGER.error("Error uploading object to S3", e);
@@ -95,7 +109,7 @@ public class S3Service {
     }
 
 
-    @PostConstruct
+//    @PostConstruct
     private void testConnection(){
         try {
             s3Client.listBuckets();

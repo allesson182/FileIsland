@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 record UpdatePassDTO(Long userId, String password){};
 record CreateUserDTO(String username, String password, String email){}
 record AuthModelDTO(String login, String password) {}
+record AuthModelResponseDTO(String id, String username, String email, String token ) {}
 record ListObjectsDTO(Long userId, String searchWord, int page, int pageSize){}
 record DownloadObjectDTO(Long userId, String objectKey){};
 record UploadObjectDTO(Long userId, String objectKey, MultipartFile file){}

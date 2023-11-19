@@ -6,6 +6,7 @@ import com.fileisland.datakeeper.Services.S3Service;
 import com.fileisland.datakeeper.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +43,7 @@ public class FileController {
 
     @GetMapping("/download")
     public ResponseEntity downloadObject(@RequestBody DownloadObjectDTO obejctDTO) throws IOException {
-        ByteArrayResource resource = s3Service.downloadObject(obejctDTO.userId().toString(), obejctDTO.objectKey());
+       Resource resource = s3Service.downloadObject(obejctDTO.userId().toString(), obejctDTO.objectKey());
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + obejctDTO.objectKey())
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)

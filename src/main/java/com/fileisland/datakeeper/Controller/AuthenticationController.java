@@ -25,7 +25,8 @@ public class AuthenticationController {
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(authModel.login(), authModel.password());
         Authentication authentication = authenticationManager.authenticate(token);
         User user = (User) authentication.getPrincipal();
+        String authToken = jwtService.generateToken(user);
 
-        return ResponseEntity.ok(jwtService.generateToken(user));
+        return ResponseEntity.ok(new AuthModelResponseDTO(user.getId().toString(), user.getUsername(), user.getEmail(), authToken));
     }
 }
