@@ -87,13 +87,17 @@ public class S3Service {
         }
 }
 
-    public void deleteObject(Long userId, String key) {
-        DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
-                        .bucket(this.bucketName)
-                        .key(userId + "/" + key)
-                        .build();
-        s3Client.deleteObject(deleteObjectRequest);
-        this.LOGGER.info("Object {} deleted successfully", key);
+    public void deleteObject(String userId, String key) {
+        try {
+            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(userId + "/" + key)
+                    .build();
+            s3Client.deleteObject(deleteObjectRequest);
+            this.LOGGER.info("Object {} deleted successfully", key);
+        } catch (Exception e) {
+            LOGGER.error("Error deleting object from S3", e);
+        }
     }
 
     public void renameObject(Long userId, String key, String newKey) {
@@ -104,7 +108,7 @@ public class S3Service {
                 .destinationKey(userId + "/" + newKey)
                 .build();
         s3Client.copyObject(copyObjectRequest);
-        this.deleteObject(userId, key);
+        this.deleteObject(userId.toString(), key);
         this.LOGGER.info("Object {} renamed successfully", key);
     }
 

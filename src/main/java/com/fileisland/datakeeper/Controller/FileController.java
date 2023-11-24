@@ -20,6 +20,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/s3")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class FileController {
 
     @Autowired
@@ -28,21 +29,23 @@ public class FileController {
     private UserService userService;
 
     @GetMapping("/list")
-    public ResponseEntity listObjects(@RequestBody ListObjectsDTO listObjectsDTO) {
+    public ResponseEntity listObjects(@RequestHeader Long userId, @RequestHeader String searchWord, @RequestHeader int page, @RequestHeader int pageSize) {
         //if page and pageSize are not present or is less than 1, set default values to 1 and 10
-        int page = Optional.of(listObjectsDTO.page()).orElse(1) < 1 ? 1 : listObjectsDTO.page();
-        int pageSize = Optional.of(listObjectsDTO.pageSize()).orElse(10) < 1 ? 10 : listObjectsDTO.pageSize();
 
-        User user = userService.findById(listObjectsDTO.userId());
+          page = page < 1 ? 1 : page;
+          pageSize = pageSize < 10 ? 10 : pageSize;
 
-        if (listObjectsDTO.searchWord() == null || listObjectsDTO.searchWord().isEmpty())
-            return ResponseEntity.ok(s3Service.listObjects(listObjectsDTO.userId(), page, pageSize));
+          User user = userService.findById(userId);
 
-        return ResponseEntity.ok(s3Service.listObjectsSearch(listObjectsDTO.userId(), listObjectsDTO.searchWord(), page, pageSize));
+          if (searchWord == null || searchWord.isEmpty())
+              return ResponseEntity.ok(s3Service.listObjects(userId, page, pageSize));
+
+          return ResponseEntity.ok(s3Service.listObjectsSearch(userId, searchWord, page, pageSize));
+
     }
 
     @GetMapping("/download")
-    public ResponseEntity downloadObject(@RequestBody DownloadObjectDTO obejctDTO) throws IOException {
+    public ResponseEntity downloadObject(@RequestHeader DownloadObjectDTO obejctDTO) throws IOException {
        Resource resource = s3Service.downloadObject(obejctDTO.userId().toString(), obejctDTO.objectKey());
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + obejctDTO.objectKey())
@@ -58,8 +61,8 @@ public class FileController {
     }
 
     @DeleteMapping
-    public ResponseEntity deleteObject(@RequestBody DeleteObjectDTO objectDTO){
-        s3Service.deleteObject(objectDTO.userId(), objectDTO.objectKey());
+    public ResponseEntity deleteObject(@RequestHeader String userId, @RequestHeader String objectKey){
+        s3Service.deleteObject(userId, objectKey);
         return ResponseEntity.ok().build();
     }
 
