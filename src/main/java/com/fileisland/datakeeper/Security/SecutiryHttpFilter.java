@@ -29,11 +29,6 @@ public class SecutiryHttpFilter extends OncePerRequestFilter {
            Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
            SecurityContextHolder.getContext().setAuthentication(authentication);
            }
-
-       response.addHeader("Access-Control-Allow-Origin", "*");
-       response.addHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, PATCH, HEAD");
-       response.addHeader("Access-Control-Allow-Headers", "*");
-
         filterChain.doFilter(request, response);
     }
 }
