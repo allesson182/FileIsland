@@ -45,13 +45,13 @@ public class FileController {
     }
 
     @GetMapping("/download")
-    public ResponseEntity downloadObject(@RequestHeader DownloadObjectDTO obejctDTO) throws IOException {
-       Resource resource = s3Service.downloadObject(obejctDTO.userId().toString(), obejctDTO.objectKey());
+    public ResponseEntity downloadObject(@RequestHeader String userId,@RequestHeader String objectKey, @RequestHeader String size) throws IOException {
+
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + obejctDTO.objectKey())
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + objectKey)
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .contentLength(resource.contentLength())
-                .body(resource);
+                .contentLength(Long.parseLong(size))
+                .body(s3Service.downloadObject(userId, objectKey));
     }
 
     @PostMapping("/upload")
