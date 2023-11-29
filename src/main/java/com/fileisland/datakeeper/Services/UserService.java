@@ -60,6 +60,16 @@ public class UserService {
     }
 
     public void createUser(String username, String password, String email) {
+        //validations
+        if (username == null || username.isEmpty())
+            throw new IllegalArgumentException("Username is empty");
+        if (password == null || password.isEmpty())
+            throw new IllegalArgumentException("Password is empty");
+        if (email == null || email.isEmpty())
+            throw new IllegalArgumentException("Email is empty");
+        if (findByUsername(username) != null)
+            throw new IllegalArgumentException("Username already exists");
+
         User user = new User();
         user.setUsername(username);
         user.setPassword(new BCryptPasswordEncoder().encode(password));
