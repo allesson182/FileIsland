@@ -30,12 +30,10 @@ public class FileController {
 
     @GetMapping("/list")
     public ResponseEntity listObjects(@RequestHeader Long userId, @RequestHeader String searchWord, @RequestHeader int page, @RequestHeader int pageSize) {
-        //if page and pageSize are not present or is less than 1, set default values to 1 and 10
-
           page = page < 1 ? 1 : page;
           pageSize = pageSize < 10 ? 10 : pageSize;
 
-          User user = userService.findById(userId);
+          userService.findById(userId);
 
           if (searchWord == null || searchWord.isEmpty())
               return ResponseEntity.ok(s3Service.listObjects(userId, page, pageSize));
