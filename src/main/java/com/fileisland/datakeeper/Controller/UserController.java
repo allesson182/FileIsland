@@ -4,10 +4,11 @@ import com.fileisland.datakeeper.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.*;
 
-@Controller("/user")
+@RestController
+@CrossOrigin(origins = "*", allowedHeaders = "*")
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired
@@ -29,10 +30,23 @@ public class UserController {
         return ResponseEntity.ok(userService.updateEmail(userId, email));
     }
     @PutMapping("/updatePassword")
-    public ResponseEntity updatePassword(Long userId, String password){
-        userService.updateUserPassword(userId, password);
+    public ResponseEntity updatePassword(@RequestBody UpdatePassDTO updatePassDTO){
+        userService.updateUserPassword(updatePassDTO.userId(), updatePassDTO.password());
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity deleteUser(Long userId){
+        userService.deleteById(userId);
+        return ResponseEntity.ok().build();
+    }
+    @PostMapping("/create")
+    public ResponseEntity createUser(@RequestBody CreateUserDTO createUser){
+        userService.createUser(createUser.username(), createUser.password(), createUser.email());
         return ResponseEntity.ok().build();
     }
 
 
 }
+
+

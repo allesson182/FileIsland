@@ -2,7 +2,12 @@ package com.fileisland.datakeeper.Services;
 
 import com.fileisland.datakeeper.Dao.Entity.User;
 import com.fileisland.datakeeper.Dao.UserDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,12 +17,14 @@ public class UserService {
     @Autowired
     UserDao userDao;
 
+    private static Logger LOGGER = LoggerFactory.getLogger(UserService.class);
+
 
     public List<User> getAllUsers() {
         return userDao.findAll();
     }
     public User findById(Long id){
-        return userDao.findById(id).orElse(null);
+        return userDao.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
     public User save(User user){
         return userDao.save(user);
@@ -39,16 +46,40 @@ public class UserService {
     }
 
     public void updateUserPassword(Long userId, String password){
-        User existingUser = userDao.findById(userId).orElse(null);
+        User user = userDao.findById(userId).orElse(null);
 
-        if (existingUser == null || password == null || password.isEmpty())
+        if (user == null || password == null || password.isEmpty())
             throw new IllegalArgumentException("User not found or password is empty");
-
-        existingUser.setPassword(password);
-        userDao.save(existingUser);
+        String encryptedPass = new BCryptPasswordEncoder().encode(password);
+        user.setPassword(encryptedPass);
+        userDao.save(user);
     }
 
     public User findByUsername(String username) {
         return userDao.findByUsername(username);
+    }
+
+    public void createUser(String username, String password, String email) {
+        //validations
+        if (username == null || username.isEmpty())
+            throw new IllegalArgumentException("Username is empty");
+        if (password == null || password.isEmpty())
+            throw new IllegalArgumentException("Password is empty");
+        if (email == null || email.isEmpty())
+            throw new IllegalArgumentException("Email is empty");
+        if (findByUsername(username) != null)
+            throw new IllegalArgumentException("Username already exists");
+
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(new BCryptPasswordEncoder().encode(password));
+        user.setEmail(email);
+        userDao.save(user);
+        LOGGER.info("User: ".concat(username).concat(" created successfully"));
+    }
+
+    public User getLoggedInUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (User) authentication.getPrincipal();
     }
 }
