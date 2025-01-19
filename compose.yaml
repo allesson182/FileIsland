@@ -1,4 +1,146 @@
+version: '3'
 services:
+  # First Pool (Existing Servers)
+  minio1:
+    image: minio/minio:latest
+    volumes:
+      - ./data1:/data1
+      - ./data2:/data2
+      - ./data3:/data3
+      - ./data4:/data4
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=password
+    networks:
+      - minio-cluster
+    command: server http://minio{1...4}/data{1...4} http://minio{5...8}/data{1...4} -console-address ":9001"
+
+
+    ports:
+      - "9001:9000"
+      - "8001:9001"
+
+  minio2:
+    image: minio/minio:latest
+    volumes:
+      - ./data5:/data1
+      - ./data6:/data2
+      - ./data7:/data3
+      - ./data8:/data4
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=password
+    networks:
+      - minio-cluster
+    command: server http://minio{1...4}/data{1...4} http://minio{5...8}/data{1...4} -console-address ":9001"
+    ports:
+      - "9002:9000"
+      - "8002:9001"
+
+  minio3:
+    image: minio/minio:latest
+    volumes:
+      - ./data9:/data1
+      - ./data10:/data2
+      - ./data11:/data3
+      - ./data12:/data4
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=password
+    networks:
+      - minio-cluster
+    command: server http://minio{1...4}/data{1...4}  http://minio{5...8}/data{1...4} -console-address ":9001"
+    ports:
+      - "9003:9000"
+      - "8003:9001"
+
+  minio4:
+    image: minio/minio:latest
+    volumes:
+      - ./data13:/data1
+      - ./data14:/data2
+      - ./data15:/data3
+      - ./data16:/data4
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=password
+    networks:
+      - minio-cluster
+    command: server http://minio{1...4}/data{1...4}  http://minio{5...8}/data{1...4} -console-address ":9001"
+    ports:
+      - "9004:9000"
+      - "8004:9001"
+
+
+
+    # Second Pool (New Servers)
+  minio5:
+    image: minio/minio:latest
+    volumes:
+      - ./data17:/data1
+      - ./data18:/data2
+      - ./data19:/data3
+      - ./data20:/data4
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=password
+    networks:
+      - minio-cluster
+    command: server http://minio{1...4}/data{1...4} http://minio{5...8}/data{1...4} -console-address ":9001"
+    ports:
+      - "9005:9000"
+      - "8005:9001"
+
+  minio6:
+    image: minio/minio:latest
+    volumes:
+      - ./data21:/data1
+      - ./data22:/data2
+      - ./data23:/data3
+      - ./data24:/data4
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=password
+    networks:
+      - minio-cluster
+    command: server http://minio{1...4}/data{1...4} http://minio{5...8}/data{1...4} -console-address ":9001"
+    ports:
+      - "9006:9000"
+      - "8006:9001"
+
+  minio7:
+    image: minio/minio:latest
+    volumes:
+      - ./data25:/data1
+      - ./data26:/data2
+      - ./data27:/data3
+      - ./data28:/data4
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=password
+    networks:
+      - minio-cluster
+    command: server http://minio{1...4}/data{1...4} http://minio{5...8}/data{1...4} -console-address ":9001"
+    ports:
+      - "9007:9000"
+      - "8007:9001"
+
+  minio8:
+    image: minio/minio:latest
+    volumes:
+      - ./data29:/data1
+      - ./data30:/data2
+      - ./data31:/data3
+      - ./data32:/data4
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=password
+    networks:
+      - minio-cluster
+    command: server http://minio{1...4}/data{1...4} http://minio{5...8}/data{1...4} -console-address ":9001"
+    ports:
+      - "9008:9000"
+      - "8008:9001"
   mariadb:
     image: 'mariadb:latest'
     environment:
@@ -8,3 +150,9 @@ services:
       - 'MARIADB_USER=myuser'
     ports:
       - '3306'
+    networks:
+      - my_net
+networks:
+  minio-cluster:
+    driver: bridge
+  my_net:
