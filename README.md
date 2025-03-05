@@ -33,7 +33,8 @@ docker run -p 9000:9000 -p 9001:9001 --name minio \
   -e "MINIO_ROOT_USER=seu_usuario" \
   -e "MINIO_ROOT_PASSWORD=sua_senha" \
   quay.io/minio/minio server /data --console-address ":9001" 
-  Ou pode utilizar o Docker compose do repositorio, que contem uma configuração de 8 nós cada um com 4 discos
+  
+  ou pode utilizar o Docker compose do repositorio, que contem uma configuração de 8 nós cada um com 4 discos
   configurando o apontamento para o local mais adequado a sua implementação
 ## Configuração do Projeto
 
